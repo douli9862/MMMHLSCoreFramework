@@ -63,12 +63,13 @@
 
 - (void)startSession:(NSString*)hlsPath
 {
-    std::unique_lock<std::mutex> mCAuto(m_MainMutex);
+    //std::unique_lock<std::mutex> mCAuto(m_MainMutex);
     bool bRet;
     if(_recorderSession){
         bRet = [_recorderSession startRecording:hlsPath];
         if(bRet){
             m_bCanInput = true;
+            NSLog(@"m_bCanInput :%d", (int)m_bCanInput);
         }
     }
 }
@@ -83,10 +84,10 @@
 
 - (void)encodeAudioWithASBD:(AudioStreamBasicDescription)asbd time:(const AudioTimeStamp *)time numberOfFrames:(UInt32)frames buffer:(AudioBufferList *)audio
 {
-    std::unique_lock<std::mutex> mCAuto(m_MainMutex);
-    if (m_bCanInput.load()) {
-        return;
-    }
+    //std::unique_lock<std::mutex> mCAuto(m_MainMutex);
+//    if (m_bCanInput.load()) {
+//        return;
+//    }
     
     if(_recorderSession){
         [_recorderSession inputAudioFrame:asbd time:time numberOfFrames:frames buffer:audio];
@@ -95,10 +96,10 @@
 
 - (void)encodeVideoWithPixelBuffer:(CVPixelBufferRef)buffer time:(CMTime)time
 {
-    std::unique_lock<std::mutex> mCAuto(m_MainMutex);
-    if (m_bCanInput.load()) {
-        return;
-    }
+    //std::unique_lock<std::mutex> mCAuto(m_MainMutex);
+//    if (m_bCanInput.load()) {
+//        return;
+//    }
     
     if(_recorderSession){
         [_recorderSession intputPixelBufferRef:buffer];
@@ -107,22 +108,23 @@
 
 - (void)encodeVideoWithSample:(CMSampleBufferRef)sample
 {
-    std::unique_lock<std::mutex> mCAuto(m_MainMutex);
+    //std::unique_lock<std::mutex> mCAuto(m_MainMutex);
 
-    if (!m_bCanInput.load()) {
-        return;
-    }
+//    if (!m_bCanInput.load()) {
+//        return;
+//    }
+    
     if(_recorderSession){
         [_recorderSession intputVidoFrame:sample];
     }
 }
 
 - (void)endSession{
-    if (!m_bCanInput.load()) {
-        return;
-    }
+//    if (!m_bCanInput.load()) {
+//        return;
+//    }
     
-    std::unique_lock<std::mutex> mCAuto(m_MainMutex);
+    //std::unique_lock<std::mutex> mCAuto(m_MainMutex);
     m_bCanInput = false;
     if(_recorderSession){
         [_recorderSession stopRecording];
