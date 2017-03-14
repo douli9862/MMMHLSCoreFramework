@@ -86,6 +86,7 @@ static int64_t GetNowUs() {
     }
     
     _aacEncoder = nil;
+    DestoryMediaPool(mAudioPool);
     NSLog(@"KFRecorder uninit end.\n");
 }
 
@@ -374,27 +375,6 @@ static int64_t GetNowUs() {
 #endif
     
     [self.locationManager stopUpdatingLocation];
-//    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-//        if (self.lastLocation) {
-//            
-//        }
-//#ifdef __ENABLE_SDK_CAPTURE_AUIDO_VIDEO__
-//        [_session stopRunning];
-//#endif
-//        self.isRecording = NO;
-//        NSError *error = nil;
-//        [_hlsWriter finishWriting:&error];
-//        if (error) {
-//            NSLog(@"Error stop recording: %@", error);
-//        }
-//        
-//        if (self.delegate && [self.delegate respondsToSelector:@selector(recorderDidFinishRecording:)]) {
-//            dispatch_async(dispatch_get_main_queue(), ^{
-//                //[self.delegate recorderDidFinishRecording:self error:error];
-//                [self.delegate recorderDidFinishRecording:error];
-//            });
-//        }
-//    });
     
     NSError *error = nil;
 

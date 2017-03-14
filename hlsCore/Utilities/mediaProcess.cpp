@@ -29,7 +29,9 @@ bool createAudioPool(void **mediaPool, int frameSize, int num)
 
 void DestoryMediaPool(void *mediaPool)
 {
-    delete  mediaPool;
+    if(mediaPool){
+        delete  mediaPool;
+    }
 }
 
 
