@@ -9,6 +9,8 @@
 #import "AVEncoder.h"
 #import "NALUnit.h"
 
+#include <mutex>
+
 static void * AVEncoderContext = &AVEncoderContext;
 
 static unsigned int to_host(unsigned char* p)
@@ -65,7 +67,9 @@ static unsigned int to_host(unsigned char* p)
     int _bitspersecond;
     CMTimeValue _firstpts;
     
-    MP4Atom* mMovie;
+    MP4Atom*    mMovie;
+    std::mutex  _Mutex;
+
 }
 
 @property (atomic) BOOL bitrateChanged;
@@ -212,6 +216,8 @@ static unsigned int to_host(unsigned char* p)
     // main file to extract video from the mdat chunk.
     if ([self parseParams:_headerWriter.path])
     {
+        //std::unique_lock<std::mutex> l(_Mutex);
+
         if (_paramsBlock)
         {
             _paramsBlock(_avcC);
@@ -566,13 +572,17 @@ static unsigned int to_host(unsigned char* p)
         if (_headerWriter)
         {
             [_headerWriter finishWithCompletionHandler:^{
+                //std::unique_lock<std::mutex> l(_Mutex);
+
                 _headerWriter = nil;
+                NSLog(@"AVEncoder:: _headerWriter finish callback");
             }];
         }
         if (_writer)
         {
             [_writer finishWithCompletionHandler:^{
                 _writer = nil;
+                NSLog(@"AVEncoder:: _writer finish callback");
             }];
         }
         // !! wait for these to finish before returning and delete temp files
