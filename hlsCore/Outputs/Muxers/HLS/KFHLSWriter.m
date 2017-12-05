@@ -72,13 +72,16 @@
     _videoStream = [[FFOutputStream alloc] initWithOutputFile:_outputFile outputCodec:@"h264"];
     [_videoStream setupVideoContextWithWidth:width height:height];
     int ret = av_opt_set_int(_outputFile.formatContext->priv_data, "hls_time", _segmentDurationSeconds, 0);
+    NSLog(@"hls_time ret:%d", ret);
     
-    NSLog(@"hls_list_size ret:%d", ret);
-    
-    ret = av_opt_set(_outputFile.formatContext->priv_data, "hls_playlist_type", "event", 0);
-
-    NSLog(@"event ret:%d", ret);
-
+    ret = av_opt_set(_outputFile.formatContext->priv_data, "hls_playlist_type", "vod", 0);
+    NSLog(@"hls_playlist_type ret:%d", ret);
+    if(ret < 0) {
+        char buf[1024];
+        av_strerror(ret, buf, 1024);
+        NSLog(@"err: %d(%s)\n", ret, buf);     //moov_size
+    }
+//    ret = av_opt_set(_outputFile.formatContext->priv_data, "moov_size", 1000*1000, 0);
 }
 
 - (void) addAudioStreamWithSampleRate:(int)sampleRate {

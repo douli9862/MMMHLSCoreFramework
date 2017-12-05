@@ -59,9 +59,9 @@
 
 #if FF_API_BUFS_VDPAU
 union AVVDPAUPictureInfo {
-    VdpPictureInfoH264 h264;
-    VdpPictureInfoMPEG1Or2 mpeg;
-    VdpPictureInfoVC1 vc1;
+    VdpPictureInfoH264        h264;
+    VdpPictureInfoMPEG1Or2    mpeg;
+    VdpPictureInfoVC1          vc1;
     VdpPictureInfoMPEG4Part2 mpeg4;
 };
 #endif
@@ -108,30 +108,33 @@ typedef struct AVVDPAUContext {
      *
      * Set by libavcodec.
      */
-    attribute_deprecated union AVVDPAUPictureInfo info;
+    attribute_deprecated
+    union AVVDPAUPictureInfo info;
 
     /**
      * Allocated size of the bitstream_buffers table.
      *
      * Set by libavcodec.
      */
-    attribute_deprecated int bitstream_buffers_allocated;
+    attribute_deprecated
+    int bitstream_buffers_allocated;
 
     /**
      * Useful bitstream buffers in the bitstream buffers table.
      *
      * Set by libavcodec.
      */
-    attribute_deprecated int bitstream_buffers_used;
+    attribute_deprecated
+    int bitstream_buffers_used;
 
-    /**
+   /**
      * Table of bitstream buffers.
      * The user is responsible for freeing this buffer using av_freep().
      *
      * Set by libavcodec.
      */
     attribute_deprecated
-        VdpBitstreamBuffer *bitstream_buffers;
+    VdpBitstreamBuffer *bitstream_buffers;
 #endif
     AVVDPAU_Render2 render2;
 } AVVDPAUContext;
@@ -207,7 +210,8 @@ AVVDPAUContext *av_vdpau_alloc_context(void);
  *
  * @return 0 on success (non-negative), a negative AVERROR on failure.
  */
-attribute_deprecated int av_vdpau_get_profile(AVCodecContext *avctx, VdpDecoderProfile *profile);
+attribute_deprecated
+int av_vdpau_get_profile(AVCodecContext *avctx, VdpDecoderProfile *profile);
 #endif
 
 #if FF_API_CAP_VDPAU

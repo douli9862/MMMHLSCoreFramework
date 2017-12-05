@@ -9,6 +9,8 @@
 #import "AVEncoder.h"
 #import "NALUnit.h"
 
+#include <mutex>
+
 static void * AVEncoderContext = &AVEncoderContext;
 
 static unsigned int to_host(unsigned char* p)
@@ -21,7 +23,6 @@ static unsigned int to_host(unsigned char* p)
 
 
 @interface AVEncoder ()
-
 {
     // initial writer, used to obtain SPS/PPS from header
     VideoEncoder* _headerWriter;
@@ -65,6 +66,10 @@ static unsigned int to_host(unsigned char* p)
     // estimate bitrate over first second
     int _bitspersecond;
     CMTimeValue _firstpts;
+    
+    MP4Atom*    mMovie;
+    std::mutex  _Mutex;
+
 }
 
 @property (atomic) BOOL bitrateChanged;
@@ -95,12 +100,18 @@ static unsigned int to_host(unsigned char* p)
     _width = width;
     _bitrate = bitrate;
     NSString* path = [NSTemporaryDirectory() stringByAppendingPathComponent:@"params.mp4"];
-    _headerWriter = [VideoEncoder encoderForPath:path Height:height andWidth:width bitrate:self.bitrate];
+    _headerWriter = [VideoEncoder encoderForPath:path
+                                          Height:(int)height
+                                        andWidth:(int)width
+                                         bitrate:(int)self.bitrate];
     _times = [NSMutableArray arrayWithCapacity:10];
     
     // swap between 3 filenames
     _currentFile = 1;
-    _writer = [VideoEncoder encoderForPath:[self makeFilename] Height:height andWidth:width bitrate:self.bitrate];
+    _writer = [VideoEncoder encoderForPath:[self makeFilename]
+                                    Height:(int)height
+                                  andWidth:(int)width
+                                   bitrate:(int)self.bitrate];
     
     [self addObserver:self forKeyPath:NSStringFromSelector(@selector(bitrate)) options:0 context:AVEncoderContext];
 }
@@ -129,8 +140,8 @@ static unsigned int to_host(unsigned char* p)
     NSFileHandle* file = [NSFileHandle fileHandleForReadingAtPath:path];
     struct stat s;
     fstat([file fileDescriptor], &s);
-    MP4Atom* movie = [MP4Atom atomAt:0 size:s.st_size type:(OSType)('file') inFile:file];
-    MP4Atom* moov = [movie childOfType:(OSType)('moov') startAt:0];
+    mMovie = [MP4Atom atomAt:0 size:s.st_size type:(OSType)('file') inFile:file];
+    MP4Atom* moov = [mMovie childOfType:(OSType)('moov') startAt:0];
     MP4Atom* trak = nil;
     if (moov != nil)
     {
@@ -184,7 +195,7 @@ static unsigned int to_host(unsigned char* p)
             if (esd != nil)
             {
                 // this is the avcC record that we are looking for
-                _avcC = [esd readAt:0 size:esd.length];
+                _avcC = [esd readAt:0 size:(int)esd.length];
                 if (_avcC != nil)
                 {
                     // extract size of length field
@@ -205,6 +216,8 @@ static unsigned int to_host(unsigned char* p)
     // main file to extract video from the mdat chunk.
     if ([self parseParams:_headerWriter.path])
     {
+        //std::unique_lock<std::mutex> l(_Mutex);
+
         if (_paramsBlock)
         {
             _paramsBlock(_avcC);
@@ -268,7 +281,10 @@ static unsigned int to_host(unsigned char* p)
                     _currentFile = 1;
                 }
                 //NSLog(@"Swap to file %d", _currentFile);
-                _writer = [VideoEncoder encoderForPath:[self makeFilename] Height:_height andWidth:_width bitrate:self.bitrate];
+                _writer = [VideoEncoder encoderForPath:[self makeFilename]
+                                                Height:(int)_height
+                                              andWidth:(int)_width
+                                               bitrate:(int)self.bitrate];
                 
                 // to do this seamlessly requires a few steps in the right order
                 // first, suspend the read source
@@ -334,7 +350,10 @@ static unsigned int to_host(unsigned char* p)
                     _currentFile = 1;
                 }
                 //NSLog(@"Swap to file %d", _currentFile);
-                _writer = [VideoEncoder encoderForPath:[self makeFilename] Height:_height andWidth:_width bitrate:self.bitrate];
+                _writer = [VideoEncoder encoderForPath:[self makeFilename]
+                                                Height:(int)_height
+                                              andWidth:(int)_width
+                                               bitrate:(int)self.bitrate];
                 
                 // to do this seamlessly requires a few steps in the right order
                 // first, suspend the read source
@@ -351,8 +370,6 @@ static unsigned int to_host(unsigned char* p)
             }
         }
         [_writer encodeFrame:sampleBuffer];
-        
-        //[_writer encodeFrame:sampleBuffer withPresentationTime:prestime];
     }
 }
 
@@ -420,7 +437,7 @@ static unsigned int to_host(unsigned char* p)
     
     struct stat s;
     fstat([_inputFile fileDescriptor], &s);
-    int cReady = s.st_size - [_inputFile offsetInFile];
+    int cReady = (int)(s.st_size - [_inputFile offsetInFile]);
     
     // locate the mdat atom if needed
     while (!_foundMDAT && (cReady > 8))
@@ -504,7 +521,7 @@ static unsigned int to_host(unsigned char* p)
 
     if (_pendingNALU)
     {
-        NALUnit nal(pNal, [nalu length]);
+        NALUnit nal(pNal, (int)[nalu length]);
         
         // we have existing data —is this the same frame?
         // typically there are a couple of NALUs per frame in iOS encoding.
@@ -521,7 +538,7 @@ static unsigned int to_host(unsigned char* p)
         else if ((naltype >= 1) && (naltype <= 5))
         {
             nal.Skip(8);
-            int first_mb = nal.GetUE();
+            int first_mb = (int)nal.GetUE();
             if (first_mb == 0)
             {
                 bNew = YES;
@@ -555,16 +572,31 @@ static unsigned int to_host(unsigned char* p)
         if (_headerWriter)
         {
             [_headerWriter finishWithCompletionHandler:^{
+                //std::unique_lock<std::mutex> l(_Mutex);
+
                 _headerWriter = nil;
+                NSLog(@"AVEncoder:: _headerWriter finish callback");
             }];
         }
         if (_writer)
         {
             [_writer finishWithCompletionHandler:^{
                 _writer = nil;
+                NSLog(@"AVEncoder:: _writer finish callback");
             }];
         }
         // !! wait for these to finish before returning and delete temp files
+        
+        if(_readQueue){
+            _readQueue = nil;
+        }
+        if(_readSource){
+            _readSource = nil;
+        }
+        
+        if(mMovie){
+            mMovie = nil;
+        }
     }
 }
 

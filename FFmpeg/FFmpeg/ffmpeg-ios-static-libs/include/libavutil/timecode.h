@@ -33,16 +33,16 @@
 #define AV_TIMECODE_STR_SIZE 16
 
 enum AVTimecodeFlag {
-    AV_TIMECODE_FLAG_DROPFRAME = 1 << 0,     ///< timecode is drop frame
-    AV_TIMECODE_FLAG_24HOURSMAX = 1 << 1,    ///< timecode wraps after 24 hours
-    AV_TIMECODE_FLAG_ALLOWNEGATIVE = 1 << 2, ///< negative time values are allowed
+    AV_TIMECODE_FLAG_DROPFRAME      = 1<<0, ///< timecode is drop frame
+    AV_TIMECODE_FLAG_24HOURSMAX     = 1<<1, ///< timecode wraps after 24 hours
+    AV_TIMECODE_FLAG_ALLOWNEGATIVE  = 1<<2, ///< negative time values are allowed
 };
 
 typedef struct {
-    int start;       ///< timecode frame start (first base frame number)
-    uint32_t flags;  ///< flags such as drop frame, +24 hours support, ...
-    AVRational rate; ///< frame rate in rational form
-    unsigned fps;    ///< frame per second; must be consistent with the rate field
+    int start;          ///< timecode frame start (first base frame number)
+    uint32_t flags;     ///< flags such as drop frame, +24 hours support, ...
+    AVRational rate;    ///< frame rate in rational form
+    unsigned fps;       ///< frame per second; must be consistent with the rate field
 } AVTimecode;
 
 /**

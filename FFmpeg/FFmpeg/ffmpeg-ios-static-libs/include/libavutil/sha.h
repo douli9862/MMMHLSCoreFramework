@@ -18,6 +18,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+/**
+ * @file
+ * @ingroup lavu_sha
+ * Public header for SHA-1 & SHA-256 hash function implementations.
+ */
+
 #ifndef AVUTIL_SHA_H
 #define AVUTIL_SHA_H
 
@@ -28,7 +34,17 @@
 
 /**
  * @defgroup lavu_sha SHA
- * @ingroup lavu_crypto
+ * @ingroup lavu_hash
+ * SHA-1 and SHA-256 (Secure Hash Algorithm) hash function implementations.
+ *
+ * This module supports the following SHA hash functions:
+ *
+ * - SHA-1: 160 bits
+ * - SHA-224: 224 bits, as a variant of SHA-2
+ * - SHA-256: 256 bits, as a variant of SHA-2
+ *
+ * @see For SHA-384, SHA-512, and variants thereof, see @ref lavu_sha512.
+ *
  * @{
  */
 
@@ -48,7 +64,7 @@ struct AVSHA *av_sha_alloc(void);
  * @param bits    number of bits in digest (SHA-1 - 160 bits, SHA-2 224 or 256 bits)
  * @return        zero if initialization succeeded, -1 otherwise
  */
-int av_sha_init(struct AVSHA *context, int bits);
+int av_sha_init(struct AVSHA* context, int bits);
 
 /**
  * Update hash value.
@@ -57,7 +73,7 @@ int av_sha_init(struct AVSHA *context, int bits);
  * @param data    input data to update hash with
  * @param len     input data length
  */
-void av_sha_update(struct AVSHA *context, const uint8_t *data, unsigned int len);
+void av_sha_update(struct AVSHA* context, const uint8_t* data, unsigned int len);
 
 /**
  * Finish hashing and output digest value.
@@ -65,7 +81,7 @@ void av_sha_update(struct AVSHA *context, const uint8_t *data, unsigned int len)
  * @param context hash function context
  * @param digest  buffer where output digest value is stored
  */
-void av_sha_final(struct AVSHA *context, uint8_t *digest);
+void av_sha_final(struct AVSHA* context, uint8_t *digest);
 
 /**
  * @}

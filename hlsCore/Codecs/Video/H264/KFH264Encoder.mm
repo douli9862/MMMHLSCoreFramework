@@ -58,16 +58,20 @@
     
     std::atomic<bool> m_exiting;
 
-
 }
 
 - (void)shutdown
 {
-    [_encoder shutdown];
+    if(nil != _encoder){
+        [_encoder shutdown];
+        NSLog(@"_encoder shutdown begin");
+        //_encoder = nil;
+        NSLog(@"_encoder shutdown end");
+    }
 }
 
 - (void) dealloc {
-    [_encoder shutdown];
+    [self shutdown];
     
     m_exiting = true;
     m_mixThreadCond.notify_all();

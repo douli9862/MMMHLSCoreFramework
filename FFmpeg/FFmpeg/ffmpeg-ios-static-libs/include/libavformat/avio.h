@@ -34,7 +34,15 @@
 
 #include "libavformat/version.h"
 
-#define AVIO_SEEKABLE_NORMAL 0x0001 /**< Seeking works like for a local file */
+/**
+ * Seeking works like for a local file.
+ */
+#define AVIO_SEEKABLE_NORMAL (1 << 0)
+
+/**
+ * Seeking by timestamp with avio_seek_time() is possible.
+ */
+#define AVIO_SEEKABLE_TIME   (1 << 1)
 
 /**
  * Callback for checking whether to abort blocking functions.
@@ -48,7 +56,7 @@
  * or AVIOContext.
  */
 typedef struct AVIOInterruptCB {
-    int (*callback)(void *);
+    int (*callback)(void*);
     void *opaque;
 } AVIOInterruptCB;
 
@@ -76,20 +84,20 @@ enum AVIODirEntryType {
  * Rest of fields are protocol or/and platform dependent and might be unknown.
  */
 typedef struct AVIODirEntry {
-    char *name;                      /**< Filename */
-    int type;                        /**< Type of the entry */
-    int utf8;                        /**< Set to 1 when name is encoded with UTF-8, 0 otherwise.
+    char *name;                           /**< Filename */
+    int type;                             /**< Type of the entry */
+    int utf8;                             /**< Set to 1 when name is encoded with UTF-8, 0 otherwise.
                                                Name can be encoded with UTF-8 even though 0 is set. */
-    int64_t size;                    /**< File size in bytes, -1 if unknown. */
-    int64_t modification_timestamp;  /**< Time of last modification in microseconds since unix
+    int64_t size;                         /**< File size in bytes, -1 if unknown. */
+    int64_t modification_timestamp;       /**< Time of last modification in microseconds since unix
                                                epoch, -1 if unknown. */
-    int64_t access_timestamp;        /**< Time of last access in microseconds since unix epoch,
+    int64_t access_timestamp;             /**< Time of last access in microseconds since unix epoch,
                                                -1 if unknown. */
-    int64_t status_change_timestamp; /**< Time of last status change in microseconds since unix
+    int64_t status_change_timestamp;      /**< Time of last status change in microseconds since unix
                                                epoch, -1 if unknown. */
-    int64_t user_id;                 /**< User ID of owner, -1 if unknown. */
-    int64_t group_id;                /**< Group ID of owner, -1 if unknown. */
-    int64_t filemode;                /**< Unix file mode, -1 if unknown. */
+    int64_t user_id;                      /**< User ID of owner, -1 if unknown. */
+    int64_t group_id;                     /**< Group ID of owner, -1 if unknown. */
+    int64_t filemode;                     /**< Unix file mode, -1 if unknown. */
 } AVIODirEntry;
 
 typedef struct AVIODirContext {
@@ -217,15 +225,15 @@ typedef struct AVIOContext {
     int (*read_packet)(void *opaque, uint8_t *buf, int buf_size);
     int (*write_packet)(void *opaque, uint8_t *buf, int buf_size);
     int64_t (*seek)(void *opaque, int64_t offset, int whence);
-    int64_t pos;     /**< position in the file of the current buffer */
-    int must_flush;  /**< true if the next seek should flush */
-    int eof_reached; /**< true if eof reached */
-    int write_flag;  /**< true if open for writing */
+    int64_t pos;            /**< position in the file of the current buffer */
+    int must_flush;         /**< true if the next seek should flush */
+    int eof_reached;        /**< true if eof reached */
+    int write_flag;         /**< true if open for writing */
     int max_packet_size;
     unsigned long checksum;
     unsigned char *checksum_ptr;
     unsigned long (*update_checksum)(unsigned long checksum, const uint8_t *buf, unsigned int size);
-    int error; /**< contains the error code or 0 if no error happened */
+    int error;              /**< contains the error code or 0 if no error happened */
     /**
      * Pause or resume playback for network streaming protocols - e.g. MMS.
      */
@@ -313,6 +321,18 @@ typedef struct AVIOContext {
      */
     enum AVIODataMarkerType current_type;
     int64_t last_time;
+
+    // add by WilliamShi
+    //ip address
+    char iPAddress[16];
+    //
+    void *h;
+
+    /**
+     * A callback that is used instead of short_seek_threshold.
+     * This is current internal only, do not use from outside.
+     */
+    int (*short_seek_get)(void *opaque);
 } AVIOContext;
 
 /**
@@ -422,13 +442,13 @@ void avio_free_directory_entry(AVIODirEntry **entry);
  * @return Allocated AVIOContext or NULL on failure.
  */
 AVIOContext *avio_alloc_context(
-    unsigned char *buffer,
-    int buffer_size,
-    int write_flag,
-    void *opaque,
-    int (*read_packet)(void *opaque, uint8_t *buf, int buf_size),
-    int (*write_packet)(void *opaque, uint8_t *buf, int buf_size),
-    int64_t (*seek)(void *opaque, int64_t offset, int whence));
+                  unsigned char *buffer,
+                  int buffer_size,
+                  int write_flag,
+                  void *opaque,
+                  int (*read_packet)(void *opaque, uint8_t *buf, int buf_size),
+                  int (*write_packet)(void *opaque, uint8_t *buf, int buf_size),
+                  int64_t (*seek)(void *opaque, int64_t offset, int whence));
 
 void avio_w8(AVIOContext *s, int b);
 void avio_write(AVIOContext *s, const unsigned char *buf, int size);
@@ -528,7 +548,8 @@ int avio_feof(AVIOContext *s);
 /**
  * @deprecated use avio_feof()
  */
-attribute_deprecated int url_feof(AVIOContext *s);
+attribute_deprecated
+int url_feof(AVIOContext *s);
 #endif
 
 /** @warning Writes up to 4 KiB per call */
@@ -559,15 +580,15 @@ int avio_read(AVIOContext *s, unsigned char *buf, int size);
  * @note return 0 if EOF, so you cannot use it if EOF handling is
  *       necessary
  */
-int avio_r8(AVIOContext *s);
+int          avio_r8  (AVIOContext *s);
 unsigned int avio_rl16(AVIOContext *s);
 unsigned int avio_rl24(AVIOContext *s);
 unsigned int avio_rl32(AVIOContext *s);
-uint64_t avio_rl64(AVIOContext *s);
+uint64_t     avio_rl64(AVIOContext *s);
 unsigned int avio_rb16(AVIOContext *s);
 unsigned int avio_rb24(AVIOContext *s);
 unsigned int avio_rb32(AVIOContext *s);
-uint64_t avio_rb64(AVIOContext *s);
+uint64_t     avio_rb64(AVIOContext *s);
 /**
  * @}
  */
@@ -602,9 +623,9 @@ int avio_get_str16be(AVIOContext *pb, int maxlen, char *buf, int buflen);
  * constants, optionally ORed with other flags.
  * @{
  */
-#define AVIO_FLAG_READ 1                                        /**< read-only */
-#define AVIO_FLAG_WRITE 2                                       /**< write-only */
-#define AVIO_FLAG_READ_WRITE (AVIO_FLAG_READ | AVIO_FLAG_WRITE) /**< read-write pseudo flag */
+#define AVIO_FLAG_READ  1                                      /**< read-only */
+#define AVIO_FLAG_WRITE 2                                      /**< write-only */
+#define AVIO_FLAG_READ_WRITE (AVIO_FLAG_READ|AVIO_FLAG_WRITE)  /**< read-write pseudo flag */
 /**
  * @}
  */
@@ -703,6 +724,18 @@ int avio_closep(AVIOContext **s);
 int avio_open_dyn_buf(AVIOContext **s);
 
 /**
+ * Return the written size and a pointer to the buffer.
+ * The AVIOContext stream is left intact.
+ * The buffer must NOT be freed.
+ * No padding is added to the buffer.
+ *
+ * @param s IO context
+ * @param pbuffer pointer to a byte buffer
+ * @return the length of the byte buffer
+ */
+int avio_get_dyn_buf(AVIOContext *s, uint8_t **pbuffer);
+
+/**
  * Return the written size and a pointer to the buffer. The buffer
  * must be freed with av_free().
  * Padding of AV_INPUT_BUFFER_PADDING_SIZE is added to the buffer.
@@ -733,7 +766,7 @@ const char *avio_enum_protocols(void **opaque, int output);
  * @param h     IO context from which to call the read_pause function pointer
  * @param pause 1 for pause, 0 for resume
  */
-int avio_pause(AVIOContext *h, int pause);
+int     avio_pause(AVIOContext *h, int pause);
 
 /**
  * Seek to a given timestamp relative to some component stream.

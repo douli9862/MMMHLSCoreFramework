@@ -54,6 +54,7 @@
 - (void) finishWithCompletionHandler:(void (^)(void))handler
 {
     if (_writer.status == AVAssetWriterStatusWriting) {
+        [_writerInput markAsFinished ];
         [_writer finishWritingWithCompletionHandler: handler];
     }
 }

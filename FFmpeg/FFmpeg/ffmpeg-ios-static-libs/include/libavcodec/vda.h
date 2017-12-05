@@ -69,7 +69,7 @@ struct vda_context {
      * - encoding: unused
      * - decoding: Set/Unset by libavcodec.
      */
-    VDADecoder decoder;
+    VDADecoder          decoder;
 
     /**
      * The Core Video pixel buffer that contains the current image data.
@@ -77,7 +77,7 @@ struct vda_context {
      * encoding: unused
      * decoding: Set by libavcodec. Unset by user.
      */
-    CVPixelBufferRef cv_buffer;
+    CVPixelBufferRef    cv_buffer;
 
     /**
      * Use the hardware decoder in synchronous mode.
@@ -85,7 +85,7 @@ struct vda_context {
      * encoding: unused
      * decoding: Set by user.
      */
-    int use_sync_decoding;
+    int                 use_sync_decoding;
 
     /**
      * The frame width.
@@ -93,7 +93,7 @@ struct vda_context {
      * - encoding: unused
      * - decoding: Set/Unset by user.
      */
-    int width;
+    int                 width;
 
     /**
      * The frame height.
@@ -101,7 +101,7 @@ struct vda_context {
      * - encoding: unused
      * - decoding: Set/Unset by user.
      */
-    int height;
+    int                 height;
 
     /**
      * The frame format.
@@ -109,7 +109,7 @@ struct vda_context {
      * - encoding: unused
      * - decoding: Set/Unset by user.
      */
-    int format;
+    int                 format;
 
     /**
      * The pixel format for output image buffers.
@@ -117,22 +117,22 @@ struct vda_context {
      * - encoding: unused
      * - decoding: Set/Unset by user.
      */
-    OSType cv_pix_fmt_type;
+    OSType              cv_pix_fmt_type;
 
     /**
      * unused
      */
-    uint8_t *priv_bitstream;
+    uint8_t             *priv_bitstream;
 
     /**
      * unused
      */
-    int priv_bitstream_size;
+    int                 priv_bitstream_size;
 
     /**
      * unused
      */
-    int priv_allocated_size;
+    int                 priv_allocated_size;
 
     /**
      * Use av_buffer to manage buffer.
@@ -143,7 +143,7 @@ struct vda_context {
      * encoding: unused
      * decoding: Set by user.
      */
-    int use_ref_buffer;
+    int                 use_ref_buffer;
 };
 
 /** Create the video decoder. */
