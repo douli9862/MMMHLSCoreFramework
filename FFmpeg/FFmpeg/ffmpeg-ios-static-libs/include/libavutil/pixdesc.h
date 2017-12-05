@@ -80,7 +80,7 @@ typedef struct AVComponentDescriptor {
  */
 typedef struct AVPixFmtDescriptor {
     const char *name;
-    uint8_t nb_components; ///< The number of components each pixel has, (1-4)
+    uint8_t nb_components;  ///< The number of components each pixel has, (1-4)
 
     /**
      * Amount to shift the luma width right to find the chroma width.
@@ -125,27 +125,27 @@ typedef struct AVPixFmtDescriptor {
 /**
  * Pixel format is big-endian.
  */
-#define AV_PIX_FMT_FLAG_BE (1 << 0)
+#define AV_PIX_FMT_FLAG_BE           (1 << 0)
 /**
  * Pixel format has a palette in data[1], values are indexes in this palette.
  */
-#define AV_PIX_FMT_FLAG_PAL (1 << 1)
+#define AV_PIX_FMT_FLAG_PAL          (1 << 1)
 /**
  * All values of a component are bit-wise packed end to end.
  */
-#define AV_PIX_FMT_FLAG_BITSTREAM (1 << 2)
+#define AV_PIX_FMT_FLAG_BITSTREAM    (1 << 2)
 /**
  * Pixel format is an HW accelerated format.
  */
-#define AV_PIX_FMT_FLAG_HWACCEL (1 << 3)
+#define AV_PIX_FMT_FLAG_HWACCEL      (1 << 3)
 /**
  * At least one pixel component is not in the first data plane.
  */
-#define AV_PIX_FMT_FLAG_PLANAR (1 << 4)
+#define AV_PIX_FMT_FLAG_PLANAR       (1 << 4)
 /**
  * The pixel format contains RGB-like data (as opposed to YUV/grayscale).
  */
-#define AV_PIX_FMT_FLAG_RGB (1 << 5)
+#define AV_PIX_FMT_FLAG_RGB          (1 << 5)
 
 /**
  * The pixel format is "pseudo-paletted". This means that it contains a
@@ -155,7 +155,7 @@ typedef struct AVPixFmtDescriptor {
  * the pixel format without using the palette.
  * An example of a pseudo-paletted format is AV_PIX_FMT_GRAY8
  */
-#define AV_PIX_FMT_FLAG_PSEUDOPAL (1 << 6)
+#define AV_PIX_FMT_FLAG_PSEUDOPAL    (1 << 6)
 
 /**
  * The pixel format has an alpha channel. This is set on all formats that
@@ -170,79 +170,12 @@ typedef struct AVPixFmtDescriptor {
  * opaque, or use the equivalent pixel formats without alpha component, e.g.
  * AV_PIX_FMT_RGB0 (or AV_PIX_FMT_RGB24 etc.) instead of AV_PIX_FMT_RGBA.
  */
-#define AV_PIX_FMT_FLAG_ALPHA (1 << 7)
+#define AV_PIX_FMT_FLAG_ALPHA        (1 << 7)
 
 /**
- * Read a line from an image, and write the values of the
- * pixel format component c to dst.
- *
- * @param data the array containing the pointers to the planes of the image
- * @param linesize the array containing the linesizes of the image
- * @param desc the pixel format descriptor for the image
- * @param x the horizontal coordinate of the first pixel to read
- * @param y the vertical coordinate of the first pixel to read
- * @param w the width of the line to read, that is the number of
- * values to write to dst
- * @param read_pal_component if not zero and the format is a paletted
- * format writes the values corresponding to the palette
- * component c in data[1] to dst, rather than the palette indexes in
- * data[0]. The behavior is undefined if the format is not paletted.
+ * The pixel format is following a Bayer pattern
  */
-void av_read_image_line(uint16_t *dst, const uint8_t *data[4],
-                        const int linesize[4], const AVPixFmtDescriptor *desc,
-                        int x, int y, int c, int w, int read_pal_component);
-
-/**
- * Write the values from src to the pixel format component c of an
- * image line.
- *
- * @param src array containing the values to write
- * @param data the array containing the pointers to the planes of the
- * image to write into. It is supposed to be zeroed.
- * @param linesize the array containing the linesizes of the image
- * @param desc the pixel format descriptor for the image
- * @param x the horizontal coordinate of the first pixel to write
- * @param y the vertical coordinate of the first pixel to write
- * @param w the width of the line to write, that is the number of
- * values to write to the image line
- */
-void av_write_image_line(const uint16_t *src, uint8_t *data[4],
-                         const int linesize[4], const AVPixFmtDescriptor *desc,
-                         int x, int y, int c, int w);
-
-/**
- * Return the pixel format corresponding to name.
- *
- * If there is no pixel format with name name, then looks for a
- * pixel format with the name corresponding to the native endian
- * format of name.
- * For example in a little-endian system, first looks for "gray16",
- * then for "gray16le".
- *
- * Finally if no pixel format has been found, returns AV_PIX_FMT_NONE.
- */
-enum AVPixelFormat av_get_pix_fmt(const char *name);
-
-/**
- * Return the short name for a pixel format, NULL in case pix_fmt is
- * unknown.
- *
- * @see av_get_pix_fmt(), av_get_pix_fmt_string()
- */
-const char *av_get_pix_fmt_name(enum AVPixelFormat pix_fmt);
-
-/**
- * Print in buf the string corresponding to the pixel format with
- * number pix_fmt, or a header if pix_fmt is negative.
- *
- * @param buf the buffer where to write the string
- * @param buf_size the size of buf
- * @param pix_fmt the number of the pixel format to print the
- * corresponding info string, or a negative value to print the
- * corresponding header.
- */
-char *av_get_pix_fmt_string(char *buf, int buf_size,
-                            enum AVPixelFormat pix_fmt);
+#define AV_PIX_FMT_FLAG_BAYER        (1 << 8)
 
 /**
  * Return the number of bits per pixel used by the pixel format
@@ -307,6 +240,103 @@ int av_pix_fmt_get_chroma_sub_sample(enum AVPixelFormat pix_fmt,
 int av_pix_fmt_count_planes(enum AVPixelFormat pix_fmt);
 
 /**
+ * @return the name for provided color range or NULL if unknown.
+ */
+const char *av_color_range_name(enum AVColorRange range);
+
+/**
+ * @return the name for provided color primaries or NULL if unknown.
+ */
+const char *av_color_primaries_name(enum AVColorPrimaries primaries);
+
+/**
+ * @return the name for provided color transfer or NULL if unknown.
+ */
+const char *av_color_transfer_name(enum AVColorTransferCharacteristic transfer);
+
+/**
+ * @return the name for provided color space or NULL if unknown.
+ */
+const char *av_color_space_name(enum AVColorSpace space);
+
+/**
+ * @return the name for provided chroma location or NULL if unknown.
+ */
+const char *av_chroma_location_name(enum AVChromaLocation location);
+
+/**
+ * Return the pixel format corresponding to name.
+ *
+ * If there is no pixel format with name name, then looks for a
+ * pixel format with the name corresponding to the native endian
+ * format of name.
+ * For example in a little-endian system, first looks for "gray16",
+ * then for "gray16le".
+ *
+ * Finally if no pixel format has been found, returns AV_PIX_FMT_NONE.
+ */
+enum AVPixelFormat av_get_pix_fmt(const char *name);
+
+/**
+ * Return the short name for a pixel format, NULL in case pix_fmt is
+ * unknown.
+ *
+ * @see av_get_pix_fmt(), av_get_pix_fmt_string()
+ */
+const char *av_get_pix_fmt_name(enum AVPixelFormat pix_fmt);
+
+/**
+ * Print in buf the string corresponding to the pixel format with
+ * number pix_fmt, or a header if pix_fmt is negative.
+ *
+ * @param buf the buffer where to write the string
+ * @param buf_size the size of buf
+ * @param pix_fmt the number of the pixel format to print the
+ * corresponding info string, or a negative value to print the
+ * corresponding header.
+ */
+char *av_get_pix_fmt_string(char *buf, int buf_size,
+                            enum AVPixelFormat pix_fmt);
+
+/**
+ * Read a line from an image, and write the values of the
+ * pixel format component c to dst.
+ *
+ * @param data the array containing the pointers to the planes of the image
+ * @param linesize the array containing the linesizes of the image
+ * @param desc the pixel format descriptor for the image
+ * @param x the horizontal coordinate of the first pixel to read
+ * @param y the vertical coordinate of the first pixel to read
+ * @param w the width of the line to read, that is the number of
+ * values to write to dst
+ * @param read_pal_component if not zero and the format is a paletted
+ * format writes the values corresponding to the palette
+ * component c in data[1] to dst, rather than the palette indexes in
+ * data[0]. The behavior is undefined if the format is not paletted.
+ */
+void av_read_image_line(uint16_t *dst, const uint8_t *data[4],
+                        const int linesize[4], const AVPixFmtDescriptor *desc,
+                        int x, int y, int c, int w, int read_pal_component);
+
+/**
+ * Write the values from src to the pixel format component c of an
+ * image line.
+ *
+ * @param src array containing the values to write
+ * @param data the array containing the pointers to the planes of the
+ * image to write into. It is supposed to be zeroed.
+ * @param linesize the array containing the linesizes of the image
+ * @param desc the pixel format descriptor for the image
+ * @param x the horizontal coordinate of the first pixel to write
+ * @param y the vertical coordinate of the first pixel to write
+ * @param w the width of the line to write, that is the number of
+ * values to write to the image line
+ */
+void av_write_image_line(const uint16_t *src, uint8_t *data[4],
+                         const int linesize[4], const AVPixFmtDescriptor *desc,
+                         int x, int y, int c, int w);
+
+/**
  * Utility function to swap the endianness of a pixel format.
  *
  * @param[in]  pix_fmt the pixel format
@@ -316,12 +346,12 @@ int av_pix_fmt_count_planes(enum AVPixelFormat pix_fmt);
  */
 enum AVPixelFormat av_pix_fmt_swap_endianness(enum AVPixelFormat pix_fmt);
 
-#define FF_LOSS_RESOLUTION 0x0001 /**< loss due to resolution change */
-#define FF_LOSS_DEPTH 0x0002      /**< loss due to color depth change */
-#define FF_LOSS_COLORSPACE 0x0004 /**< loss due to color space conversion */
-#define FF_LOSS_ALPHA 0x0008      /**< loss of alpha bits */
-#define FF_LOSS_COLORQUANT 0x0010 /**< loss due to color quantization */
-#define FF_LOSS_CHROMA 0x0020     /**< loss of chroma (e.g. RGB to gray conversion) */
+#define FF_LOSS_RESOLUTION  0x0001 /**< loss due to resolution change */
+#define FF_LOSS_DEPTH       0x0002 /**< loss due to color depth change */
+#define FF_LOSS_COLORSPACE  0x0004 /**< loss due to color space conversion */
+#define FF_LOSS_ALPHA       0x0008 /**< loss of alpha bits */
+#define FF_LOSS_COLORQUANT  0x0010 /**< loss due to color quantization */
+#define FF_LOSS_CHROMA      0x0020 /**< loss of chroma (e.g. RGB to gray conversion) */
 
 /**
  * Compute what kind of losses will occur when converting from one specific
@@ -365,30 +395,5 @@ int av_get_pix_fmt_loss(enum AVPixelFormat dst_pix_fmt,
  */
 enum AVPixelFormat av_find_best_pix_fmt_of_2(enum AVPixelFormat dst_pix_fmt1, enum AVPixelFormat dst_pix_fmt2,
                                              enum AVPixelFormat src_pix_fmt, int has_alpha, int *loss_ptr);
-
-/**
- * @return the name for provided color range or NULL if unknown.
- */
-const char *av_color_range_name(enum AVColorRange range);
-
-/**
- * @return the name for provided color primaries or NULL if unknown.
- */
-const char *av_color_primaries_name(enum AVColorPrimaries primaries);
-
-/**
- * @return the name for provided color transfer or NULL if unknown.
- */
-const char *av_color_transfer_name(enum AVColorTransferCharacteristic transfer);
-
-/**
- * @return the name for provided color space or NULL if unknown.
- */
-const char *av_color_space_name(enum AVColorSpace space);
-
-/**
- * @return the name for provided chroma location or NULL if unknown.
- */
-const char *av_chroma_location_name(enum AVChromaLocation location);
 
 #endif /* AVUTIL_PIXDESC_H */

@@ -222,7 +222,7 @@ static inline av_const int av_isgraph(int c)
 static inline av_const int av_isspace(int c)
 {
     return c == ' ' || c == '\f' || c == '\n' || c == '\r' || c == '\t' ||
-        c == '\v';
+           c == '\v';
 }
 
 /**
@@ -344,16 +344,17 @@ enum AVEscapeMode {
  * @return the length of the allocated string, or a negative error code in case of error
  * @see av_bprint_escape()
  */
-av_warn_unused_result int av_escape(char **dst, const char *src, const char *special_chars,
-                                    enum AVEscapeMode mode, int flags);
+av_warn_unused_result
+int av_escape(char **dst, const char *src, const char *special_chars,
+              enum AVEscapeMode mode, int flags);
 
-#define AV_UTF8_FLAG_ACCEPT_INVALID_BIG_CODES 1          ///< accept codepoints over 0x10FFFF
-#define AV_UTF8_FLAG_ACCEPT_NON_CHARACTERS 2             ///< accept non-characters - 0xFFFE and 0xFFFF
-#define AV_UTF8_FLAG_ACCEPT_SURROGATES 4                 ///< accept UTF-16 surrogates codes
+#define AV_UTF8_FLAG_ACCEPT_INVALID_BIG_CODES          1 ///< accept codepoints over 0x10FFFF
+#define AV_UTF8_FLAG_ACCEPT_NON_CHARACTERS             2 ///< accept non-characters - 0xFFFE and 0xFFFF
+#define AV_UTF8_FLAG_ACCEPT_SURROGATES                 4 ///< accept UTF-16 surrogates codes
 #define AV_UTF8_FLAG_EXCLUDE_XML_INVALID_CONTROL_CODES 8 ///< exclude control codes not accepted by XML
 
 #define AV_UTF8_FLAG_ACCEPT_ALL \
-    AV_UTF8_FLAG_ACCEPT_INVALID_BIG_CODES | AV_UTF8_FLAG_ACCEPT_NON_CHARACTERS | AV_UTF8_FLAG_ACCEPT_SURROGATES
+    AV_UTF8_FLAG_ACCEPT_INVALID_BIG_CODES|AV_UTF8_FLAG_ACCEPT_NON_CHARACTERS|AV_UTF8_FLAG_ACCEPT_SURROGATES
 
 /**
  * Read and decode a single UTF-8 code point (character) from the
@@ -383,8 +384,9 @@ av_warn_unused_result int av_escape(char **dst, const char *src, const char *spe
  * @return >= 0 in case a sequence was successfully read, a negative
  * value in case of invalid sequence
  */
-av_warn_unused_result int av_utf8_decode(int32_t *codep, const uint8_t **bufp, const uint8_t *buf_end,
-                                         unsigned int flags);
+av_warn_unused_result
+int av_utf8_decode(int32_t *codep, const uint8_t **bufp, const uint8_t *buf_end,
+                   unsigned int flags);
 
 /**
  * Check if a name is in a list.

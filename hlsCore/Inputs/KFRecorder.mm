@@ -17,6 +17,8 @@
 
 #include "../Utilities/mediaProcess.h"
 
+#import "MMMHLSCoreFrameworkVersion.h"
+
 
 //#define   __ENABLE_SDK_CAPTURE_AUIDO_VIDEO__
 

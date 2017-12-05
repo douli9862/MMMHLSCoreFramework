@@ -111,7 +111,7 @@ enum AVStereo3DType {
 /**
  * Inverted views, Right/Bottom represents the left view.
  */
-#define AV_STEREO3D_FLAG_INVERT (1 << 0)
+#define AV_STEREO3D_FLAG_INVERT     (1 << 0)
 
 /**
  * Stereo 3D type: this structure describes how two videos are packed

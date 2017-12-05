@@ -31,14 +31,12 @@
  * This helps ensuring binary compatibility with future versions.
  */
 
-#define FF_PAD_STRUCTURE(name, size, ...)                                  \
-    struct ff_pad_helper_##name {                                          \
-        __VA_ARGS__                                                        \
-    };                                                                     \
-    typedef struct name {                                                  \
-        __VA_ARGS__                                                        \
-        char reserved_padding[size - sizeof(struct ff_pad_helper_##name)]; \
-    } name;
+#define FF_PAD_STRUCTURE(name, size, ...) \
+struct ff_pad_helper_##name { __VA_ARGS__ }; \
+typedef struct name { \
+    __VA_ARGS__ \
+    char reserved_padding[size - sizeof(struct ff_pad_helper_##name)]; \
+} name;
 
 /**
  * Buffer to print data progressively
@@ -82,18 +80,19 @@
  */
 
 FF_PAD_STRUCTURE(AVBPrint, 1024,
-                 char *str;         /**< string so far */
-                 unsigned len;      /**< length so far */
-                 unsigned size;     /**< allocated memory */
-                 unsigned size_max; /**< maximum allocated memory */
-                 char reserved_internal_buffer[1];)
+    char *str;         /**< string so far */
+    unsigned len;      /**< length so far */
+    unsigned size;     /**< allocated memory */
+    unsigned size_max; /**< maximum allocated memory */
+    char reserved_internal_buffer[1];
+)
 
 /**
  * Convenience macros for special values for av_bprint_init() size_max
  * parameter.
  */
-#define AV_BPRINT_SIZE_UNLIMITED ((unsigned)-1)
-#define AV_BPRINT_SIZE_AUTOMATIC 1
+#define AV_BPRINT_SIZE_UNLIMITED  ((unsigned)-1)
+#define AV_BPRINT_SIZE_AUTOMATIC  1
 #define AV_BPRINT_SIZE_COUNT_ONLY 0
 
 /**
